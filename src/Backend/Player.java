@@ -29,4 +29,5 @@ public abstract class Player extends Unit implements HeroicUnit {
         setAttack(attack + ATTACK_PER_LEVEL * level);
         setDefense(defense + DEFENSE_PER_LEVEL * level);
     }
+    public abstract int getAbilityRange();
 }

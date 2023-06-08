@@ -1,5 +1,7 @@
 package Backend.PlayerCharacters;
 
+import Backend.Player;
+
 public class Mage extends Player {
     protected int maxMana;
     protected int currentMana;
@@ -7,14 +9,12 @@ public class Mage extends Player {
     protected int spellPower;
     protected int spellHits;
     protected int spellRange;
-
     protected final int MANA_PER_LEVEL = 25;
     protected final int POWER_PER_LEVEL = 4;
 
-    public Mage(String _name, int _maxHealth, int _attack, int _defense, int _expValue, int _maxMana, int _manaCost, int _spellPower, int _spellHits, int _spellRange){
-        super(_name, _maxHealth, _attack, _defense, _expValue);
+    public Mage(String _name, int _maxHealth, int _attack, int _defense, int _maxMana, int _manaCost, int _spellPower, int _spellHits, int _spellRange){
+        super(_name, _maxHealth, _attack, _defense);
         maxMana = _maxMana;
-        currentMana = _maxMana;
         manaCost = _manaCost;
         spellPower = _spellPower;
         spellHits = _spellHits;
@@ -37,5 +37,21 @@ public class Mage extends Player {
         setMaxMana(maxMana + MANA_PER_LEVEL * level);
         setCurrentMana(Math.min(maxMana, currentMana + maxMana/4));
         setSpellPower(spellPower + POWER_PER_LEVEL * level);
+    }
+
+    public void setMaxMana(int amount){
+        maxMana = amount;
+    }
+
+    public void setCurrentMana(int amount){
+        currentMana = amount;
+    }
+
+    public void setSpellPower(int amount){
+        spellPower = amount;
+    }
+
+    public int getAbilityRange(){
+        return spellRange;
     }
 }

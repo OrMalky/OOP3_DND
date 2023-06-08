@@ -5,12 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c02a5d7a-28ac-45f0-8b47-c64719d8e568" name="Changes" comment="First commit">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Backend/Position2D.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Backend/PlayerCharacters/Rouge.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Backend/PlayerCharacters/Warrior.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/GameBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/GameBoard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/GameTile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/GameTile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/Position.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/Enemies/Boss.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/Enemies/Boss.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/Enemies/Monster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/Enemies/Monster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/Enemies/Trap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/Enemies/Trap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/HeroicUnit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/HeroicUnit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/PlayerCharacters/Mage.Java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/PlayerCharacters/Mage.Java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/Unit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/Unit.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +34,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectId" id="2Qujb3cSKYEN42CdFQXdHvDTgHp" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -40,7 +47,9 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true"
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

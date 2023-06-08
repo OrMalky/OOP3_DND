@@ -10,10 +10,17 @@ public abstract class Unit {
     public Unit(String _name, int _maxHealth, int _attack, int _defense){
         name = _name;
         maxHealth = _maxHealth;
-        currentHealth = _maxHealth;
         attack = _attack;
         defense = _defense;
         currentHealth = maxHealth;
+    }
+
+    public void takeDamage(int damage){
+        currentHealth -= damage;
+        if(currentHealth <= 0){
+            currentHealth = 0;
+            //TODO: Die
+        }
     }
 
     public String getName(){
