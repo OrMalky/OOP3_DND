@@ -8,4 +8,6 @@ public class GameTile {
         tile = _tile;
         position = _pos;
     }
+
+    
 }
