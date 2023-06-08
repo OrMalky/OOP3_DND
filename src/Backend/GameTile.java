@@ -1,10 +1,10 @@
 package Backend;
 
 public class GameTile {
-    private char tile;
-    private Position position;
+    private Unit tile;
+    private Position2D position;
 
-    public GameTile(char _tile, Position _pos){
+    public GameTile(Unit _tile, Position2D _pos){
         tile = _tile;
         position = _pos;
     }
