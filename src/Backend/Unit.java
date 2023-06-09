@@ -1,7 +1,5 @@
 package Backend;
 
-
-
 public abstract class Unit {
     protected String name;
     protected int maxHealth;
@@ -9,53 +7,56 @@ public abstract class Unit {
     protected int attack;
     protected int defense;
 
-    public Unit(String _name, int _maxHealth, int _attack, int _defense){
+    public Unit(String _name, int _maxHealth, int _attack, int _defense) {
         name = _name;
         maxHealth = _maxHealth;
-        currentHealth = _maxHealth;
         attack = _attack;
         defense = _defense;
         currentHealth = maxHealth;
     }
-    
 
-    public String getName(){
+    public void takeDamage(int damage) {
+        setCurrentHealth(defense - damage > 0 ? (currentHealth - (defense - damage)) : currentHealth);
+        if (currentHealth <= 0) {
+            currentHealth = 0;
+
+        }
+    }
+
+    public String getName() {
         return name;
     }
 
-    public int getMaxHealth(){
+    public int getMaxHealth() {
         return maxHealth;
     }
 
-    public int getCurrentHealth(){
+    public int getCurrentHealth() {
         return currentHealth;
     }
 
-    public int getAttack(){
+    public int getAttack() {
         return attack;
     }
 
-    public int getDefense(){
+    public int getDefense() {
         return defense;
     }
 
-    public void setMaxHealth(int _maxHealth){
+    public void setMaxHealth(int _maxHealth) {
         maxHealth = _maxHealth;
     }
 
-    public void setCurrentHealth(int _currentHealth){
+    public void setCurrentHealth(int _currentHealth) {
         currentHealth = _currentHealth;
     }
 
-    public void setAttack(int _attack){
+    public void setAttack(int _attack) {
         attack = _attack;
     }
 
-    public void setDefense(int _defense){
+    public void setDefense(int _defense) {
         defense = _defense;
     }
 
-    public void takeDamage(int amount){
-        setCurrentHealth(defense- amount > 0 ? (currentHealth - ( defense - amount )) : currentHealth);
-    }
 }

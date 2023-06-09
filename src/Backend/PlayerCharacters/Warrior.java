@@ -1,9 +1,11 @@
 package Backend.PlayerCharacters;
 
-import java.util.ArrayList;
-
 import Backend.Player;
 import Backend.Unit;
+import java.util.ArrayList;
+
+import java.util.Random;
+
 
 public class Warrior extends Player {
 
@@ -11,21 +13,25 @@ public class Warrior extends Player {
     protected int currentCooldown;
     protected final int ABILITY_RANGE = 3;
 
-    public Warrior(int _abilityCooldown, String _name, int _maxHealth, int _attack, int _defense) {
+    private Random rand = new Random();
+
+    public Warrior(String _name, int _maxHealth, int _attack, int _defense, int _abilityCooldown) {
         super(_name, _maxHealth, _attack, _defense);
         abilityCooldown = _abilityCooldown;
     }
 
+    //Not sure we want this to work this way, we need a way to tell the GameManager that the player has used their ability
+    //Maybe EventListener?
     public boolean castAbility(ArrayList<Unit> targets) {
-        if (currentCooldown > 0)
-            return false;
-        currentCooldown = abilityCooldown;
-        setCurrentHealth(Math.min(currentHealth + 10 * defense, maxHealth));
-        // Randomly hits one enemy within range < 3 for an amount equals to 10% of the
-        // warrior’s max health.
-        // manager will send him the targets with getAbilityRange (heroic method)
-        chooseRandom(targets).takeDamage(maxHealth / 10);
-        return true;
+        if (currentCooldown <= 0)
+        {
+            currentCooldown = abilityCooldown;
+            setCurrentHealth(Math.min(currentHealth + 10 * defense, maxHealth));
+            targets.get(rand.nextInt(targets.size())).takeDamage(maxHealth / 10);
+            return true;
+        }
+
+        return false;
     }
 
     public void levelUp() {
@@ -44,5 +50,4 @@ public class Warrior extends Player {
     public int getAbilityRange() {
         return ABILITY_RANGE;
     }
-
 }
