@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import java.util.Random;
 
-
 public class Warrior extends Player {
 
     protected int abilityCooldown;
@@ -20,11 +19,11 @@ public class Warrior extends Player {
         abilityCooldown = _abilityCooldown;
     }
 
-    //Not sure we want this to work this way, we need a way to tell the GameManager that the player has used their ability
-    //Maybe EventListener?
+    // Not sure we want this to work this way, we need a way to tell the GameManager
+    // that the player has used their ability
+    // Maybe EventListener?
     public boolean castAbility(ArrayList<Unit> targets) {
-        if (currentCooldown <= 0)
-        {
+        if (currentCooldown <= 0) {
             currentCooldown = abilityCooldown;
             setCurrentHealth(Math.min(currentHealth + 10 * defense, maxHealth));
             targets.get(rand.nextInt(targets.size())).takeDamage(maxHealth / 10);
@@ -49,5 +48,14 @@ public class Warrior extends Player {
 
     public int getAbilityRange() {
         return ABILITY_RANGE;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Name: %s | Health: %d/%d | Attack: %d | Defense: %d | Level: %d | Experience: %d/%d | Cooldown: %d/%d",
+                name, currentHealth, maxHealth, attack, defense, level, exp, EXP_PER_LEVEL, currentCooldown,
+                abilityCooldown);
+
     }
 }

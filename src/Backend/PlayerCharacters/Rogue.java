@@ -45,4 +45,12 @@ public class Rogue extends Player {
 
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "Name: %s | Health: %d/%d | Attack: %d | Defense: %d | Level: %d | Experience: %d/%d |Energy: %d/%d | Cost: %d",
+                name, currentHealth, maxHealth, attack, defense, level, exp, EXP_PER_LEVEL, MAX_ENERGY, currentEnergy,
+                cost);
+    }
+
 }

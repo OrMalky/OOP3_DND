@@ -31,4 +31,6 @@ public class Boss extends Enemy implements HeroicUnit {
         throw new UnsupportedOperationException("Unimplemented method 'getAbilityRange'");
     }
 
+    
+
 }

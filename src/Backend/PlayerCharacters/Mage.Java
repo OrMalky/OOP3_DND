@@ -15,7 +15,8 @@ public class Mage extends Player {
     protected final int MANA_PER_LEVEL = 25;
     protected final int POWER_PER_LEVEL = 4;
 
-    public Mage(String _name, int _maxHealth, int _attack, int _defense, int _maxMana, int _manaCost, int _spellPower, int _spellHits, int _spellRange){
+    public Mage(String _name, int _maxHealth, int _attack, int _defense, int _maxMana, int _manaCost, int _spellPower,
+            int _spellHits, int _spellRange) {
         super(_name, _maxHealth, _attack, _defense);
         maxMana = _maxMana;
         manaCost = _manaCost;
@@ -26,11 +27,10 @@ public class Mage extends Player {
     }
 
     public void castAbility() {
-        if(currentMana >= manaCost){
+        if (currentMana >= manaCost) {
             currentMana -= manaCost;
             System.out.println("You cast a spell!");
-        }
-        else{
+        } else {
             System.out.println("You don't have enough mana!");
         }
     }
@@ -38,23 +38,23 @@ public class Mage extends Player {
     protected void levelUp() {
         super.levelUp();
         setMaxMana(maxMana + MANA_PER_LEVEL * level);
-        setCurrentMana(Math.min(maxMana, currentMana + maxMana/4));
+        setCurrentMana(Math.min(maxMana, currentMana + maxMana / 4));
         setSpellPower(spellPower + POWER_PER_LEVEL * level);
     }
 
-    public void setMaxMana(int amount){
+    public void setMaxMana(int amount) {
         maxMana = amount;
     }
 
-    public void setCurrentMana(int amount){
+    public void setCurrentMana(int amount) {
         currentMana = amount;
     }
 
-    public void setSpellPower(int amount){
+    public void setSpellPower(int amount) {
         spellPower = amount;
     }
 
-    public int getAbilityRange(){
+    public int getAbilityRange() {
         return spellRange;
     }
 
@@ -62,5 +62,14 @@ public class Mage extends Player {
     public boolean castAbility(ArrayList<Unit> target) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'castAbility'");
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Name: %s | Health: %d/%d | Attack: %d | Defense: %d | Level: %d | Experience: %d/%d | Mana: %d/%d | Mana Cost: %d | Spell Power: %d | Spell Hits: %d | Spell Range: %d",
+                name, currentHealth, maxHealth, attack, defense, level, exp, EXP_PER_LEVEL, currentMana, maxMana,
+                manaCost, spellPower, spellHits, spellRange);
+
     }
 }
