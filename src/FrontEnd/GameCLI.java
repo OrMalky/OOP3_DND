@@ -16,11 +16,15 @@ public class GameCLI implements RenderCallBack {
     }
 
     public void start() {
-
+        String StartCommand;
+        String command = "";
         printOpeningScreen();
 
-        String command = scanner.nextLine();
-        gameManager.startGame(command);
+        while (!gameManager.isGameStarted()) {
+            StartCommand = scanner.nextLine();
+            gameManager.startGame(StartCommand);
+
+        }
 
         // Game loop
         while (!gameManager.isOver()) {
@@ -29,7 +33,6 @@ public class GameCLI implements RenderCallBack {
 
             // Process user input
             processCommand(command);
-
             command = scanner.nextLine();
             clearConsole();
 
@@ -49,6 +52,11 @@ public class GameCLI implements RenderCallBack {
 
     @Override
     public void renderPlayerBar(String output) {
+        System.out.println(output);
+    }
+
+    @Override
+    public void renderSystemMessage(String output) {
         System.out.println(output);
     }
 

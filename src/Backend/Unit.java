@@ -22,13 +22,14 @@ public abstract class Unit {
         currentHealth = maxHealth;
     }
 
-    public void takeDamage(int attackPoints) {
+    public Hit takeDamage(int attackPoints,Unit attacker) {
         int damage = rand.nextInt(attackPoints) - rand.nextInt(defense);
         setCurrentHealth(damage > 0 ? (currentHealth - damage) : currentHealth);
         if (currentHealth <= 0) {
             currentHealth = 0;
-
+            return new Hit(attack, damage, true, attacker, this, this.getExpValue());
         }
+        return new Hit(attack, damage, false, attacker, this, this.getExpValue());
         
     }
     
@@ -47,6 +48,8 @@ public abstract class Unit {
     public int getAttack() {
         return attack;
     }
+
+    public abstract int getExpValue();
 
     public int getDefense() {
         return defense;

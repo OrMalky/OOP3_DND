@@ -3,6 +3,7 @@ package Backend;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import Backend.GameTile.TileType;
 
@@ -117,31 +118,32 @@ public class GameBoard {
         currentBoard[pos2.x][pos2.y] = temp;
     }
 
-    public void movePlayerUp() {
-        movePlayer(Direction.UP);
-    }
-
-    public void movePlayerDown() {
-        movePlayer(Direction.DOWN);
-    }
-
-    public void movePlayerLeft() {
-        movePlayer(Direction.LEFT);
-    }
-
-    public void movePlayerRight() {
-        movePlayer(Direction.RIGHT);
-    }
-
-    private void movePlayer(Direction direction) {
+    public String movePlayer(Direction direction) {
         int newX = playerPosition.x + direction.getDeltaX();
         int newY = playerPosition.y + direction.getDeltaY();
-
         if (isValidMove(newX, newY)) {
             switchPlaces(playerPosition, new Position2D(newX, newY));
             playerPosition.x = newX;
             playerPosition.y = newY;
+            return "";
         }
+        return "Invalid move";
+    }
+
+    ArrayList<Unit> getAllUnitsInRange(int range) {
+        ArrayList<Unit> unitsInRange = new ArrayList<Unit>();
+        for (int i = 0; i < currentBoard.length; i++) {
+            for (GameTile tile : currentBoard[i]) {
+                if (tile.getType() == TileType.UNIT && getRange(tile.getPosition(), playerPosition) <= range)
+                    unitsInRange.add(tile.getUnit());
+            }
+        }
+        return unitsInRange;
+    }
+
+    public String castSpecialAbility() {
+        ArrayList<Unit> unitsInRange = getAllUnitsInRange(player.getAbilityRange());
+        return player.castAbility(unitsInRange);
     }
 
     private boolean isValidMove(int x, int y) {

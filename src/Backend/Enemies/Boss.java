@@ -20,7 +20,7 @@ public class Boss extends Enemy implements HeroicUnit {
     }
 
     @Override
-    public boolean castAbility(ArrayList<Unit> target) {
+    public String castAbility(ArrayList<Unit> target) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'castAbility'");
     }
@@ -30,6 +30,8 @@ public class Boss extends Enemy implements HeroicUnit {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAbilityRange'");
     }
+
+
 
     
 

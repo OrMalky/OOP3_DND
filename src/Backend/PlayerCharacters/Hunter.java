@@ -37,19 +37,18 @@ public class Hunter extends Player {
     }
 
     @Override
-    public boolean castAbility(ArrayList<Unit> target) {
+    public String castAbility(ArrayList<Unit> target) {
         if (arrowCount <= 0) {
-            return false;
+           return "could not cast ability, no arrows";
         }
         arrowCount--;
-        target.get(0).takeDamage(attack);
-        return true;
+        return target.get(0).takeDamage(attack,this).toString();
+        
     }
 
     @Override
     public int getAbilityRange() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAbilityRange'");
+        return range;
     }
 
     @Override

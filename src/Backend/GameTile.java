@@ -10,6 +10,7 @@ public class GameTile {
         EMPTY,
         UNIT
     }
+
     public GameTile(TileType type, Position2D position) {
         this.type = type;
         this.position = position;
@@ -33,5 +34,9 @@ public class GameTile {
         return position;
     }
 
-
+    /*
+     * public String toString(){
+     * return
+     * }
+     */
 }

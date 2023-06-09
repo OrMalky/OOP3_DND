@@ -2,6 +2,8 @@ package Backend.PlayerCharacters;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import Backend.Hit;
 import Backend.Player;
 import Backend.Unit;
 
@@ -52,16 +54,17 @@ public class Mage extends Player {
     }
 
     @Override
-    public boolean castAbility(ArrayList<Unit> target) {
+    public String castAbility(ArrayList<Unit> target) {
+        ArrayList<Hit> hits = new ArrayList<Hit>();
         if (currentMana < manaCost) {
-            return false;
+            return "Could not cast ability: not enough mana";
         }
-        int hits = 0;
-        while (hits < spellHits) {
-            target.get(rand.nextInt(target.size())).takeDamage(spellPower);
-            hits++;
+        int hitsCount = 0;
+        while (hitsCount < spellHits) {
+            hits.add(target.get(rand.nextInt(target.size())).takeDamage(spellPower, this));
+            hitsCount++;
         }
-        return true;
+        return hits.toString();
 
     }
 

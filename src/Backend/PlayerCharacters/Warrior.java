@@ -22,15 +22,13 @@ public class Warrior extends Player {
     // Not sure we want this to work this way, we need a way to tell the GameManager
     // that the player has used their ability
     // Maybe EventListener?
-    public boolean castAbility(ArrayList<Unit> targets) {
+    public String castAbility(ArrayList<Unit> targets) {
         if (currentCooldown <= 0) {
             currentCooldown = abilityCooldown;
             setCurrentHealth(Math.min(currentHealth + 10 * defense, maxHealth));
-            targets.get(rand.nextInt(targets.size())).takeDamage(maxHealth / 10);
-            return true;
+            return  targets.get(rand.nextInt(targets.size())).takeDamage(maxHealth / 10,this).toString();
         }
-
-        return false;
+        return "Could not cast ability, still on cooldown";
     }
 
     public void levelUp() {

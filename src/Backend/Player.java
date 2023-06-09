@@ -21,6 +21,8 @@ public abstract class Player extends Unit implements HeroicUnit {
         }
     }
 
+
+
     protected void levelUp(){
         exp -= EXP_PER_LEVEL * level;
         level++;
@@ -30,4 +32,8 @@ public abstract class Player extends Unit implements HeroicUnit {
         setDefense(defense + DEFENSE_PER_LEVEL * level);
     }
     public abstract int getAbilityRange();
+
+    public int getExpValue(){
+        return -1;
+    }
 }

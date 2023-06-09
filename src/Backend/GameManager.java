@@ -1,50 +1,66 @@
 package Backend;
 
+import Backend.GameBoard.Direction;
+
 public class GameManager {
     GameBoard board;
     private RenderCallBack renderCallBack;
     boolean isOver;
     CharacterFactory cf;
     String systemMessage;
+    boolean gameStarted;
 
     public GameManager() {
         isOver = false;
+        gameStarted = false;
         cf = new CharacterFactory();
         String systemMessage = "";
-
     }
 
     public void startGame(String number) {
         try {
             board = new GameBoard(cf.createPlayer(number), cf);
             board.initializeBoard();
+            systemMessage = "Game started";
+            renderCallBack.renderSystemMessage(systemMessage);
+            gameStarted = true;
         } catch (Exception e) {
-            systemMessage = ("Invalid input: " + number + " try again");
+            systemMessage = "Invalid input: " + number + " try again";
+            renderCallBack.renderSystemMessage(systemMessage);
 
         }
     }
 
-    
     public void handleInput(String input) {
         switch (input) {
             case "w":
-                board.movePlayerUp();
-
+                systemMessage = board.movePlayer(Direction.UP);
+                break;
             case "a":
-                board.movePlayerLeft();
-
+                systemMessage = board.movePlayer(Direction.LEFT);
+                break;
             case "s":
-                board.movePlayerDown();
-
+                systemMessage = board.movePlayer(Direction.DOWN);
+                break;
             case "d":
-                board.movePlayerRight();
-
+                systemMessage = board.movePlayer(Direction.RIGHT);
+                break;
+            case "q":
+                break;
+            case "e":
+                systemMessage = board.castSpecialAbility();
+                break;
+            case "":
+                break;
             default:
                 systemMessage = ("Invalid input: " + input + " try again");
-                ;
-
+                break;
         }
         updateCLI();
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
     }
 
     public boolean isOver() {
@@ -55,6 +71,7 @@ public class GameManager {
         if (renderCallBack != null) {
             renderCallBack.renderPlayerBar(board.getPlayerInfo());
             renderCallBack.renderScreen(board.getBoardAsString());
+            renderCallBack.renderSystemMessage(systemMessage);
         }
     }
 

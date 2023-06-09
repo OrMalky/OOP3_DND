@@ -9,6 +9,8 @@ public class Trap extends Enemy{
     protected int ticksCount;
     protected boolean isVisible;
 
+
+
     public Trap(String _name, int _maxHealth, int _attack, int _defense, int _expValue, int _visibilityTime, int _invisibilityTime){
         super(_name, _maxHealth,  _attack, _defense, _expValue);
        // visibilityRange = _visibilityRange;
@@ -17,4 +19,6 @@ public class Trap extends Enemy{
         ticksCount = 0;
         isVisible = true;
     }
+
+
 }

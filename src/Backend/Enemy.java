@@ -9,6 +9,10 @@ public abstract class Enemy extends Unit{
         expValue = _expValue;
     }
 
+    public int getExpValue(){
+        return expValue;
+    }
+
     
 
 

@@ -2,6 +2,7 @@ package Backend.PlayerCharacters;
 
 import java.util.ArrayList;
 
+import Backend.Hit;
 import Backend.Player;
 import Backend.Unit;
 
@@ -37,11 +38,15 @@ public class Rogue extends Player {
     }
 
     @Override
-    public boolean castAbility(ArrayList<Unit> targets) {
+    public String castAbility(ArrayList<Unit> targets) {
+        ArrayList<Hit> hits = new ArrayList<Hit>();
         if (currentEnergy - cost < 0)
-            return false;
-        targets.forEach(unit -> unit.takeDamage(attack));
-        return true;
+            return "Could not cast ability, not enough energy";
+        for (Unit target : targets) {
+            hits.add(target.takeDamage(attack, this));
+        }
+        return (hits.toString());
+        
 
     }
 

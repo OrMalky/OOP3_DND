@@ -52,7 +52,7 @@ public class CharacterFactory {
         tileDictionary.put("The Mountain", 'M');
         tileDictionary.put("Queen Cersei", 'C');
         tileDictionary.put("Night's King", 'K');
-        tileDictionary.put("Tal Malma", '#');
+        tileDictionary.put("Tal Malma", 'T');
         return tileDictionary;
     }
 
