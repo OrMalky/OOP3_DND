@@ -7,7 +7,7 @@ import java.io.IOException;
 public class GameBoard {
     private GameTile[][] currentBoard;
     int currentLevel;
-
+    
     GameBoard() {
         currentLevel = 1;
         parseLevel(1);

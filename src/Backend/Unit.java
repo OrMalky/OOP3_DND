@@ -1,11 +1,18 @@
 package Backend;
 
+import java.util.Random;
+
+
+
 public abstract class Unit {
     protected String name;
     protected int maxHealth;
     protected int currentHealth;
     protected int attack;
     protected int defense;
+
+    private Random rand = new Random();
+
 
     public Unit(String _name, int _maxHealth, int _attack, int _defense) {
         name = _name;
@@ -15,14 +22,16 @@ public abstract class Unit {
         currentHealth = maxHealth;
     }
 
-    public void takeDamage(int damage) {
-        setCurrentHealth(defense - damage > 0 ? (currentHealth - (defense - damage)) : currentHealth);
+    public void takeDamage(int attackPoints) {
+        int damage = rand.nextInt(attackPoints) - rand.nextInt(defense);
+        setCurrentHealth(damage > 0 ? (currentHealth - damage) : currentHealth);
         if (currentHealth <= 0) {
             currentHealth = 0;
 
         }
+        
     }
-
+    
     public String getName() {
         return name;
     }

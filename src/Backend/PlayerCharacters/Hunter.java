@@ -10,10 +10,10 @@ public class Hunter extends Player {
     protected int arrowCount;
     protected int tickCount;
 
-    public Hunter(String _name, int _maxHealth, int _attack, int _defense, int _range, int _arrowCount) {
+    public Hunter(String _name, int _maxHealth, int _attack, int _defense, int _range) {
         super(_name, _maxHealth, _attack, _defense);
         range = _range;
-        arrowCount = _arrowCount;
+        arrowCount = 0;
         tickCount = 0;
     }
 

@@ -1,7 +1,7 @@
 package Backend.PlayerCharacters;
 
 import java.util.ArrayList;
-
+import java.util.Random;
 import Backend.Player;
 import Backend.Unit;
 
@@ -15,6 +15,8 @@ public class Mage extends Player {
     protected final int MANA_PER_LEVEL = 25;
     protected final int POWER_PER_LEVEL = 4;
 
+    private Random rand = new Random();
+
     public Mage(String _name, int _maxHealth, int _attack, int _defense, int _maxMana, int _manaCost, int _spellPower,
             int _spellHits, int _spellRange) {
         super(_name, _maxHealth, _attack, _defense);
@@ -24,15 +26,6 @@ public class Mage extends Player {
         spellHits = _spellHits;
         currentMana = _maxMana;
         spellRange = _spellRange;
-    }
-
-    public void castAbility() {
-        if (currentMana >= manaCost) {
-            currentMana -= manaCost;
-            System.out.println("You cast a spell!");
-        } else {
-            System.out.println("You don't have enough mana!");
-        }
     }
 
     protected void levelUp() {
@@ -60,8 +53,16 @@ public class Mage extends Player {
 
     @Override
     public boolean castAbility(ArrayList<Unit> target) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'castAbility'");
+        if (currentMana < manaCost) {
+            return false;
+        }
+        int hits = 0;
+        while (hits < spellHits) {
+            target.get(rand.nextInt(target.size())).takeDamage(spellPower);
+            hits++;
+        }
+        return true;
+
     }
 
     @Override
