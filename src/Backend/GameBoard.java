@@ -38,7 +38,7 @@ public class GameBoard {
     Position2D playerPosition;
     Player player;
 
-    GameBoard(Player _player, CharacterFactory _cf) {
+    GameBoard(Player _player, CharacterFactory _cf, MassageCallBack _massageCallBack) {
         currentLevel = 1;
         cf = _cf;
         player = _player;
@@ -75,6 +75,16 @@ public class GameBoard {
             for (int j = 0; j < numCols; j++) {
                 char tileChar = levelString[i].charAt(j);
                 currentBoard[i][j] = createGameTile(tileChar, i, j);
+            }
+        }
+    }
+
+    public void tick() {
+        for (GameTile[] row : currentBoard) {
+            for (GameTile tile : row) {
+                if (tile.getType() == TileType.UNIT) {
+                    tile.getUnit().tick();
+                }
             }
         }
     }
@@ -118,16 +128,16 @@ public class GameBoard {
         currentBoard[pos2.x][pos2.y] = temp;
     }
 
-    public String movePlayer(Direction direction) {
+    public void movePlayer(Direction direction) {
         int newX = playerPosition.x + direction.getDeltaX();
         int newY = playerPosition.y + direction.getDeltaY();
         if (isValidMove(newX, newY)) {
             switchPlaces(playerPosition, new Position2D(newX, newY));
             playerPosition.x = newX;
             playerPosition.y = newY;
-            return "";
+
         }
-        return "Invalid move";
+
     }
 
     ArrayList<Unit> getAllUnitsInRange(int range) {
@@ -141,9 +151,9 @@ public class GameBoard {
         return unitsInRange;
     }
 
-    public String castSpecialAbility() {
+    public void castSpecialAbility() {
         ArrayList<Unit> unitsInRange = getAllUnitsInRange(player.getAbilityRange());
-        return player.castAbility(unitsInRange);
+        player.castAbility(unitsInRange);
     }
 
     private boolean isValidMove(int x, int y) {

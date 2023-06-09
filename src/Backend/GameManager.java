@@ -1,32 +1,34 @@
 package Backend;
 
+import java.util.ArrayList;
+
 import Backend.GameBoard.Direction;
 
-public class GameManager {
+public class GameManager implements MassageCallBack {
     GameBoard board;
     private RenderCallBack renderCallBack;
     boolean isOver;
     CharacterFactory cf;
-    String systemMessage;
+    ArrayList<String> systemMessages;
     boolean gameStarted;
 
     public GameManager() {
         isOver = false;
         gameStarted = false;
-        cf = new CharacterFactory();
-        String systemMessage = "";
+
+        cf = new CharacterFactory(this);
+        systemMessages = new ArrayList<String>();
     }
 
     public void startGame(String number) {
         try {
-            board = new GameBoard(cf.createPlayer(number), cf);
+            board = new GameBoard(cf.createPlayer(number), cf, this);
             board.initializeBoard();
-            systemMessage = "Game started";
-            renderCallBack.renderSystemMessage(systemMessage);
+            systemMessages.add("Game started");
+
             gameStarted = true;
         } catch (Exception e) {
-            systemMessage = "Invalid input: " + number + " try again";
-            renderCallBack.renderSystemMessage(systemMessage);
+            systemMessages.add("Invalid input: " + number + " try again");
 
         }
     }
@@ -34,28 +36,29 @@ public class GameManager {
     public void handleInput(String input) {
         switch (input) {
             case "w":
-                systemMessage = board.movePlayer(Direction.UP);
+                board.movePlayer(Direction.UP);
                 break;
             case "a":
-                systemMessage = board.movePlayer(Direction.LEFT);
+                board.movePlayer(Direction.LEFT);
                 break;
             case "s":
-                systemMessage = board.movePlayer(Direction.DOWN);
+                board.movePlayer(Direction.DOWN);
                 break;
             case "d":
-                systemMessage = board.movePlayer(Direction.RIGHT);
+                board.movePlayer(Direction.RIGHT);
                 break;
             case "q":
                 break;
             case "e":
-                systemMessage = board.castSpecialAbility();
+                board.castSpecialAbility();
                 break;
             case "":
                 break;
             default:
-                systemMessage = ("Invalid input: " + input + " try again");
+                systemMessages.add("Invalid input: " + input + " try again");
                 break;
         }
+        board.tick();
         updateCLI();
     }
 
@@ -71,12 +74,26 @@ public class GameManager {
         if (renderCallBack != null) {
             renderCallBack.renderPlayerBar(board.getPlayerInfo());
             renderCallBack.renderScreen(board.getBoardAsString());
-            renderCallBack.renderSystemMessage(systemMessage);
+            renderSystemMessages();
+        }
+    }
+
+    public void renderSystemMessages() {
+        if (renderCallBack != null) {
+            for (String message : systemMessages) {
+                renderCallBack.renderSystemMessage(message);
+            }
+            systemMessages.clear();
         }
     }
 
     public void setRenderCallback(RenderCallBack renderCallBack) {
         this.renderCallBack = renderCallBack;
+    }
+
+    @Override
+    public void addSystemMassage(String message) {
+        systemMessages.add(message);
     }
 
 }

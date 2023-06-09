@@ -3,7 +3,7 @@ package Backend.PlayerCharacters;
 import java.util.ArrayList;
 import java.util.Random;
 
-import Backend.Hit;
+import Backend.MassageCallBack;
 import Backend.Player;
 import Backend.Unit;
 
@@ -20,8 +20,8 @@ public class Mage extends Player {
     private Random rand = new Random();
 
     public Mage(String _name, int _maxHealth, int _attack, int _defense, int _maxMana, int _manaCost, int _spellPower,
-            int _spellHits, int _spellRange) {
-        super(_name, _maxHealth, _attack, _defense);
+            int _spellHits, int _spellRange, MassageCallBack _massageCallBack) {
+        super(_name, _maxHealth, _attack, _defense, _massageCallBack);
         maxMana = _maxMana;
         manaCost = _manaCost;
         spellPower = _spellPower;
@@ -35,6 +35,10 @@ public class Mage extends Player {
         setMaxMana(maxMana + MANA_PER_LEVEL * level);
         setCurrentMana(Math.min(maxMana, currentMana + maxMana / 4));
         setSpellPower(spellPower + POWER_PER_LEVEL * level);
+    }
+
+    public void tick() {
+       // setCurrentMana(Math.min(maxMana, currentMana + level));
     }
 
     public void setMaxMana(int amount) {
@@ -54,17 +58,15 @@ public class Mage extends Player {
     }
 
     @Override
-    public String castAbility(ArrayList<Unit> target) {
-        ArrayList<Hit> hits = new ArrayList<Hit>();
+    public void castAbility(ArrayList<Unit> target) {
         if (currentMana < manaCost) {
-            return "Could not cast ability: not enough mana";
+            messageCallback.addSystemMassage("Could not cast ability: not enough mana");
         }
         int hitsCount = 0;
         while (hitsCount < spellHits) {
-            hits.add(target.get(rand.nextInt(target.size())).takeDamage(spellPower, this));
+            target.get(rand.nextInt(target.size())).takeDamage(spellPower, this);
             hitsCount++;
         }
-        return hits.toString();
 
     }
 

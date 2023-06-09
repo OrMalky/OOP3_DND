@@ -2,7 +2,8 @@ package Backend.PlayerCharacters;
 
 import java.util.ArrayList;
 
-import Backend.Hit;
+
+import Backend.MassageCallBack;
 import Backend.Player;
 import Backend.Unit;
 
@@ -12,8 +13,8 @@ public class Rogue extends Player {
     protected final int ABILITY_RANGE = 2;
     protected final int MAX_ENERGY = 100;
 
-    public Rogue(String _name, int _maxHealth, int _attack, int _defense, int _cost) {
-        super(_name, _maxHealth, _attack, _defense);
+    public Rogue(String _name, int _maxHealth, int _attack, int _defense, int _cost, MassageCallBack _massageCallBack) {
+        super(_name, _maxHealth, _attack, _defense, _massageCallBack);
         cost = _cost;
         currentEnergy = 0;
     }
@@ -38,16 +39,14 @@ public class Rogue extends Player {
     }
 
     @Override
-    public String castAbility(ArrayList<Unit> targets) {
-        ArrayList<Hit> hits = new ArrayList<Hit>();
+    public void castAbility(ArrayList<Unit> targets) {
         if (currentEnergy - cost < 0)
-            return "Could not cast ability, not enough energy";
-        for (Unit target : targets) {
-            hits.add(target.takeDamage(attack, this));
-        }
-        return (hits.toString());
-        
-
+            messageCallback.addSystemMassage("Could not cast ability, not enough energy");
+        else{
+            for (Unit target : targets) {
+             target.takeDamage(attack, this);
+            }
+        }        
     }
 
     @Override

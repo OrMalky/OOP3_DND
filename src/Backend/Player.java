@@ -1,6 +1,6 @@
 package Backend;
 
-public abstract class Player extends Unit implements HeroicUnit {
+public abstract class Player extends Unit implements HeroicUnit  {
     protected int exp;
     protected int level;
     protected final int EXP_PER_LEVEL = 50;
@@ -8,8 +8,9 @@ public abstract class Player extends Unit implements HeroicUnit {
     protected final int ATTACK_PER_LEVEL = 4;
     protected final int DEFENSE_PER_LEVEL = 1;
 
-    public Player(String _name, int _maxHealth, int _attack, int _defense){
-        super(_name, _maxHealth, _attack, _defense);
+
+    public Player(String _name, int _maxHealth, int _attack, int _defense, MassageCallBack _massageCallBack) {
+        super(_name, _maxHealth, _attack, _defense, _massageCallBack);
         exp = 0;
         level = 1;
     }
@@ -36,4 +37,7 @@ public abstract class Player extends Unit implements HeroicUnit {
     public int getExpValue(){
         return -1;
     }
+    
+
+
 }
