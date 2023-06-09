@@ -1,12 +1,37 @@
 package Backend;
 
 public class GameTile {
-    private Unit tile;
+    private TileType type;
+    private Unit unit;
     private Position2D position;
 
-    public GameTile(Unit _tile, Position2D _pos) {
-        tile = _tile;
-        position = _pos;
+    public enum TileType {
+        BORDER,
+        EMPTY,
+        UNIT
     }
+    public GameTile(TileType type, Position2D position) {
+        this.type = type;
+        this.position = position;
+    }
+
+    public GameTile(Unit unit, Position2D position) {
+        this.type = TileType.UNIT;
+        this.unit = unit;
+        this.position = position;
+    }
+
+    public TileType getType() {
+        return type;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public Position2D getPosition() {
+        return position;
+    }
+
 
 }
