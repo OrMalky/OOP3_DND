@@ -1,5 +1,8 @@
 package Backend;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public abstract class Player extends Unit implements HeroicUnit {
     protected int exp;
     protected int level;
@@ -21,6 +24,7 @@ public abstract class Player extends Unit implements HeroicUnit {
         }
     }
 
+
     protected void levelUp(){
         exp -= EXP_PER_LEVEL * level;
         level++;
@@ -28,5 +32,8 @@ public abstract class Player extends Unit implements HeroicUnit {
         setCurrentHealth(maxHealth);
         setAttack(attack + ATTACK_PER_LEVEL * level);
         setDefense(defense + DEFENSE_PER_LEVEL * level);
+    }
+    public Unit chooseRandom(ArrayList<Unit> targets){
+        return targets.get(new Random().nextInt(targets.size()));
     }
 }

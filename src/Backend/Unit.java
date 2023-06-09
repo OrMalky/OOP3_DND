@@ -1,5 +1,7 @@
 package Backend;
 
+
+
 public abstract class Unit {
     protected String name;
     protected int maxHealth;
@@ -15,6 +17,7 @@ public abstract class Unit {
         defense = _defense;
         currentHealth = maxHealth;
     }
+    
 
     public String getName(){
         return name;
@@ -50,5 +53,9 @@ public abstract class Unit {
 
     public void setDefense(int _defense){
         defense = _defense;
+    }
+
+    public void takeDamage(int amount){
+        setCurrentHealth(defense- amount > 0 ? (currentHealth - ( defense - amount )) : currentHealth);
     }
 }
