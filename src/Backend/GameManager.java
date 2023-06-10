@@ -1,65 +1,114 @@
 package Backend;
 
-import java.util.ArrayList;
+import java.util.Scanner;
 
 import Backend.GameBoard.Direction;
+import Frontend.GameCLI;
 
-public class GameManager implements MassageCallBack {
-    GameBoard board;
-    private RenderCallBack renderCallBack;
-    boolean isOver;
-    CharacterFactory cf;
-    ArrayList<String> systemMessages;
-    boolean gameStarted;
+public class GameManager {
+    private Scanner scanner;
 
+    private GameBoard board;
+    private GameCLI gameCLI;
+    private CharacterFactory cf;
+    
+    private Player player;
+
+    private boolean gameStarted;
+    private boolean isOver;
+
+    private final String UP = "w";
+    private final String DOWN = "s";
+    private final String LEFT = "a";
+    private final String RIGHT = "d";
+    private final String WAIT = "q";
+    private final String SPECIAL_ABILITY = "e";
+    
     public GameManager() {
         isOver = false;
         gameStarted = false;
 
-        cf = new CharacterFactory(this);
-        systemMessages = new ArrayList<String>();
+        cf = new CharacterFactory();
+        scanner = new Scanner(System.in);
+        gameCLI = new GameCLI();
     }
 
-    public void startGame(String number) {
-        try {
-            board = new GameBoard(cf.createPlayer(number), cf, this);
-            board.initializeBoard();
-            systemMessages.add("Game started");
+    public void startGame() {
+        CharacterFactory.Character playerCharacter = characterSelection();
+        player = cf.choosePlayer(playerCharacter);
+        board = new GameBoard(cf, player);
+        board.parseLevel(1);
+        gameLoop();
+    }
 
-            gameStarted = true;
-        } catch (Exception e) {
-            systemMessages.add("Invalid input: " + number + " try again");
+    private CharacterFactory.Character characterSelection(){
+        CharacterFactory.Character character = null;
+        int input = 0;
+        do {
+            gameCLI.clearConsole();
+            gameCLI.printOpeningScreen(cf.getCharacters());
+            try{
+                input = scanner.nextInt();
+                character = CharacterFactory.Character.values()[input - 1];
+                gameStarted = true;
+            } catch (Exception e) {
+                scanner.nextLine();
+                gameCLI.addMessage("Invalid input try again");
+            }
+        } while (!gameStarted);
+        return character;
+    }
 
+    public void gameLoop() {
+        while (!isOver) {
+            boolean isValid = false;
+            do{
+                gameCLI.clearConsole();
+                gameCLI.renderPlayerBar(player);
+                gameCLI.renderBoard(board);
+                gameCLI.printMessages();
+                gameCLI.render("Choose an action: ");
+                String input = scanner.next();
+                isValid = handleInput(input);
+            } while (!isValid);
+            board.tick();
         }
     }
 
-    public void handleInput(String input) {
+    public boolean handleInput(String input) {
+        Direction dir = null;
         switch (input) {
-            case "w":
-                board.movePlayer(Direction.UP);
+            case UP:
+                dir = Direction.UP;
                 break;
-            case "a":
-                board.movePlayer(Direction.LEFT);
+            case DOWN:
+                dir = Direction.DOWN;
                 break;
-            case "s":
-                board.movePlayer(Direction.DOWN);
+            case LEFT:
+                dir = Direction.LEFT;
                 break;
-            case "d":
-                board.movePlayer(Direction.RIGHT);
+            case RIGHT:
+                dir = Direction.RIGHT;
                 break;
-            case "q":
-                break;
-            case "e":
+            case WAIT:
+                return true;
+            case SPECIAL_ABILITY:
                 board.castSpecialAbility();
                 break;
-            case "":
-                break;
             default:
-                systemMessages.add("Invalid input: " + input + " try again");
-                break;
+                gameCLI.addMessage("Invalid input " + input + " try again");
+                return false;
         }
-        board.tick();
-        updateCLI();
+        return playInput(dir);
+    }
+
+    private boolean playInput(Direction direction) {
+        if(!board.interact(direction))
+        {
+            gameCLI.addMessage("Invalid move");
+            return false;
+        }
+        return true;
     }
 
     public boolean isGameStarted() {
@@ -69,31 +118,4 @@ public class GameManager implements MassageCallBack {
     public boolean isOver() {
         return isOver;
     }
-
-    public void updateCLI() {
-        if (renderCallBack != null) {
-            renderCallBack.renderPlayerBar(board.getPlayerInfo());
-            renderCallBack.renderScreen(board.getBoardAsString());
-            renderSystemMessages();
-        }
-    }
-
-    public void renderSystemMessages() {
-        if (renderCallBack != null) {
-            for (String message : systemMessages) {
-                renderCallBack.renderSystemMessage(message);
-            }
-            systemMessages.clear();
-        }
-    }
-
-    public void setRenderCallback(RenderCallBack renderCallBack) {
-        this.renderCallBack = renderCallBack;
-    }
-
-    @Override
-    public void addSystemMassage(String message) {
-        systemMessages.add(message);
-    }
-
 }

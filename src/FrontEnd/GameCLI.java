@@ -1,62 +1,28 @@
-package FrontEnd;
+package Frontend;
 
-import Backend.GameManager;
-import Backend.RenderCallBack;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GameCLI implements RenderCallBack {
-    private GameManager gameManager;
-    private Scanner scanner;
+import Backend.GameBoard;
+import Backend.Player;
 
-    public GameCLI(GameManager gameManager) {
-        this.gameManager = gameManager;
-        gameManager.setRenderCallback(this);
-        this.scanner = new Scanner(System.in);
 
+public class GameCLI {
+    private List<String> messages;
+
+    public GameCLI() {
+        messages = new ArrayList<>();
     }
 
-    public void start() {
-        String StartCommand;
-        String command = "";
-        printOpeningScreen();
-
-        while (!gameManager.isGameStarted()) {
-            StartCommand = scanner.nextLine();
-            gameManager.startGame(StartCommand);
-
-        }
-
-        // Game loop
-        while (!gameManager.isOver()) {
-            // Display the game state
-            // displayGameState();
-
-            // Process user input
-            processCommand(command);
-            command = scanner.nextLine();
-            clearConsole();
-
-        }
-
-        System.out.println("Game Over!");
+    public void renderPlayerBar(Player player) {
+        System.out.println(player.toString());
     }
 
-    private void processCommand(String command) {
-        gameManager.handleInput(command);
+    public void renderBoard(GameBoard board) {
+        System.out.println(board.toString());
     }
 
-    @Override
-    public void renderScreen(String output) {
-        System.out.println(output);
-    }
-
-    @Override
-    public void renderPlayerBar(String output) {
-        System.out.println(output);
-    }
-
-    @Override
-    public void renderSystemMessage(String output) {
+    public void render(String output) {
         System.out.println(output);
     }
 
@@ -77,30 +43,37 @@ public class GameCLI implements RenderCallBack {
         }
     }
 
-    public void printOpeningScreen() {
-        System.out.println("Welcome to the game!");
-        System.out.println("Choose your player: ");
-        System.out.println(getPlayerSelectionString());
+    public void printOpeningScreen(List<Player> characters) {
+        int index = 1;
+        StringBuilder selectionString = new StringBuilder("Welcome to Dungeons & Dragons!\n");
+        for (Player c : characters) {
+            selectionString.append(index + "\t" + c.getDescription() + '\n');
+            index++;
+        }
+        selectionString.append("\n");
+        selectionString.append(popMessages() + '\n');
+        selectionString.append("Choose your character: ");
+        System.out.print(selectionString.toString());
     }
 
-    public String getPlayerSelectionString() {
-        StringBuilder selectionString = new StringBuilder("Select player:\n");
-        selectionString.append(
-                "1. Jon Snow             Health: 300/300         Attack: 30              Defense: 4              Level: 1                Experience: 0/50                Cooldown: 0/3\n");
-        selectionString.append(
-                "2. The Hound            Health: 400/400         Attack: 20              Defense: 6              Level: 1                Experience: 0/50                Cooldown: 0/5\n");
-        selectionString.append(
-                "3. Melisandre           Health: 100/100         Attack: 5               Defense: 1              Level: 1                Experience: 0/50                Mana: 75/300            Spell Power: 15\n");
-        selectionString.append(
-                "4. Thoros of Myr        Health: 250/250         Attack: 25              Defense: 4              Level: 1                Experience: 0/50                Mana: 37/150            Spell Power: 20\n");
-        selectionString.append(
-                "5. Arya Stark           Health: 150/150         Attack: 40              Defense: 2              Level: 1                Experience: 0/50                Energy: 100/100\n");
-        selectionString.append(
-                "6. Bronn                Health: 250/250         Attack: 35              Defense: 3              Level: 1                Experience: 0/50                Energy: 100/100\n");
-        selectionString.append(
-                "7. Ygritte              Health: 220/220         Attack: 30              Defense: 2              Level: 1                Experience: 0/50                Arrows: 10              Range: 6\n");
-
-        return selectionString.toString();
+    public void printMessages(){
+        System.out.println();
+        for (String message : messages) {
+            System.out.println(message + '\n');
+        }
+        messages.clear();
     }
 
+    private String popMessages(){
+        StringBuilder messageString = new StringBuilder();
+        for (String message : messages) {
+            messageString.append(message);
+        }
+        messages.clear();
+        return messageString.toString();
+    }
+
+    public void addMessage(String message){
+        messages.add(message);
+    }
 }

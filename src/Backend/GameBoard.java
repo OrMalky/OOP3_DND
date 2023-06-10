@@ -5,8 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import Backend.GameTile.TileType;
-
 public class GameBoard {
 
     public enum Direction {
@@ -19,8 +17,8 @@ public class GameBoard {
         private final int deltaY;
 
         Direction(int horozonial, int vertial) {
-            this.deltaX = vertial;
-            this.deltaY = horozonial;
+            this.deltaX = horozonial;
+            this.deltaY = vertial;
         }
 
         public int getDeltaX() {
@@ -30,31 +28,31 @@ public class GameBoard {
         public int getDeltaY() {
             return deltaY;
         }
+
+        public Position2D getDeltaPosition() {
+            return new Position2D(deltaX, deltaY);
+        }
     }
 
     private GameTile[][] currentBoard;
-    int currentLevel;
-    CharacterFactory cf;
-    Position2D playerPosition;
-    Player player;
+    private Player player;
+    private CharacterFactory cf;
+    private GameTile playerTile;
 
-    GameBoard(Player _player, CharacterFactory _cf, MassageCallBack _massageCallBack) {
-        currentLevel = 1;
+    private final char EMPTY = '.';
+    private final char WALL = '#';
+    private final char PLAYER = '@';
+
+    GameBoard(CharacterFactory _cf, Player _player) {
         cf = _cf;
         player = _player;
     }
 
-    public void initializeBoard() {
-        currentLevel = 1;
-        parseLevel(1);
-    }
-
-    public String getBoardAsString() {
+    public String toString() {
         StringBuilder s = new StringBuilder();
         for (GameTile[] row : currentBoard) {
             for (GameTile tile : row) {
-                s.append(tile.getType() == TileType.UNIT ? cf.getTileChar(tile.getUnit().getName())
-                        : tile.getType() == TileType.BORDER ? '#' : '.');
+                s.append(tile == null ? "." : tile.getUnit() == null ? '#' : tile.getUnit().getTile());
             }
             s.append("\n");
         }
@@ -68,13 +66,14 @@ public class GameBoard {
 
     public void parseLevel(int level) {
         String[] levelString = readMap(level).split("\n");
-        int numRows = levelString.length;
-        int numCols = levelString[0].length();
-        currentBoard = new GameTile[numRows][numCols];
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numCols; j++) {
-                char tileChar = levelString[i].charAt(j);
-                currentBoard[i][j] = createGameTile(tileChar, i, j);
+        int rows = levelString.length;
+        int cols = levelString[0].length();
+        currentBoard = new GameTile[rows][cols];
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                char tileChar = levelString[y].charAt(x);
+                Position2D pos = new Position2D(x, y);
+                setTileAt(createGameTile(tileChar, pos), pos);
             }
         }
     }
@@ -82,32 +81,28 @@ public class GameBoard {
     public void tick() {
         for (GameTile[] row : currentBoard) {
             for (GameTile tile : row) {
-                if (tile.getType() == TileType.UNIT) {
+                if (tile != null && tile.getUnit() != null){
                     tile.getUnit().tick();
                 }
             }
         }
     }
 
-    private GameTile createGameTile(char tileChar, int i, int j) {
+    private GameTile createGameTile(char tileChar, Position2D pos) {
         switch (tileChar) {
-            case '.':
-                return new GameTile(TileType.EMPTY, new Position2D(i, j));
-            case '#':
-                return new GameTile(TileType.BORDER, new Position2D(i, j));
-            case '@':
-                playerPosition = new Position2D(i, j);
-                return new GameTile(player, new Position2D(i, j));
+            case EMPTY:
+                return null;
+            case WALL:
+                return new GameTile(null, pos);
+            case PLAYER:
+                playerTile = new GameTile(player, pos);
+                return playerTile;
             default:
-                return new GameTile(cf.createEnemy(tileChar), new Position2D(i, j));
+                return new GameTile(cf.createEnemy(tileChar), pos);
         }
     }
 
-    public void parseNextLevel() {
-        parseLevel(++currentLevel);
-    }
-
-    public String readMap(int level) {
+    private String readMap(int level) {
         StringBuilder text = new StringBuilder();
         String path = System.getProperty("user.dir") + "\\levels_dir\\level" + level + ".txt";
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
@@ -121,30 +116,37 @@ public class GameBoard {
         return text.toString();
     }
 
-    // Swtich places of two tiles on the board
-    public void switchPlaces(Position2D pos1, Position2D pos2) {
-        GameTile temp = currentBoard[pos1.x][pos1.y];
-        currentBoard[pos1.x][pos1.y] = currentBoard[pos2.x][pos2.y];
-        currentBoard[pos2.x][pos2.y] = temp;
+    // Player interaction
+    public boolean interact(Direction direction) {
+        GameTile player = getTileAt(playerTile.getPosition());
+        Position2D newPos = Position2D.add(playerTile.getPosition(), direction.getDeltaPosition());
+        if(getTileAt(newPos) == null) {
+            move(player, newPos);
+            return true;
+        } else {
+            return interact(player, getTileAt(newPos));
+        }
     }
 
-    public void movePlayer(Direction direction) {
-        int newX = playerPosition.x + direction.getDeltaX();
-        int newY = playerPosition.y + direction.getDeltaY();
-        if (isValidMove(newX, newY)) {
-            switchPlaces(playerPosition, new Position2D(newX, newY));
-            playerPosition.x = newX;
-            playerPosition.y = newY;
+    // Tiles interactions
+    public boolean interact(GameTile performer, GameTile target) {
+        if(target.getUnit() == null)
+            return false;
+        return true;
+    }
 
-        }
-
+    private void move(GameTile tile, Position2D pos){
+        Position2D oldPos = tile.getPosition();
+        setTileAt(tile, pos);
+        setTileAt(null, oldPos);
+        tile.setPosition(pos);
     }
 
     ArrayList<Unit> getAllUnitsInRange(int range) {
         ArrayList<Unit> unitsInRange = new ArrayList<Unit>();
         for (int i = 0; i < currentBoard.length; i++) {
             for (GameTile tile : currentBoard[i]) {
-                if (tile.getType() == TileType.UNIT && getRange(tile.getPosition(), playerPosition) <= range)
+                if (tile != null && tile.getUnit() != null && getRange(tile.getPosition(), playerTile.getPosition()) <= range)
                     unitsInRange.add(tile.getUnit());
             }
         }
@@ -156,17 +158,11 @@ public class GameBoard {
         player.castAbility(unitsInRange);
     }
 
-    private boolean isValidMove(int x, int y) {
-        if (x < 0 || x >= currentBoard.length || y < 0 || y >= currentBoard[0].length) {
-            // Out of bounds
-            return false;
-        }
-
-        return currentBoard[x][y].getType() == TileType.EMPTY;
+    private GameTile getTileAt(Position2D pos){
+        return currentBoard[pos.y][pos.x];
     }
 
-    public String getPlayerInfo() {
-        return player.toString();
+    private void setTileAt(GameTile tile, Position2D pos){
+        currentBoard[pos.y][pos.x] = tile;
     }
-
 }

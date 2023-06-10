@@ -2,7 +2,6 @@ package Backend.PlayerCharacters;
 
 import java.util.ArrayList;
 
-import Backend.MassageCallBack;
 import Backend.Player;
 import Backend.Unit;
 
@@ -10,20 +9,24 @@ public class Hunter extends Player {
     protected int range;
     protected int arrowCount;
     protected int tickCount;
-    
 
-    public Hunter(String _name, int _maxHealth, int _attack, int _defense, int _range, MassageCallBack _massageCallBack) {
-        super(_name, _maxHealth, _attack, _defense, _massageCallBack);
+    protected final int ARROWS_PER_LEVEL = 10;
+    protected final int ATTACK_PER_LEVEL = 2;
+    protected final int DEFENSE_PER_LEVEL = 1;
+
+    public Hunter(String _name, int _maxHealth, int _attack, int _defense, int _range) {
+        super(_name, _maxHealth, _attack, _defense);
         range = _range;
         arrowCount = 0;
         tickCount = 0;
+        type = Type.HUNTER;
     }
 
     public void levelUp() {
         super.levelUp();
-        setAttack(attack + 2 * level);
-        setDefense(defense + level);
-        setArrowCount(arrowCount + 10 * level);
+        setAttack(attack + ATTACK_PER_LEVEL * level);
+        setDefense(defense + DEFENSE_PER_LEVEL * level);
+        setArrowCount(arrowCount + ARROWS_PER_LEVEL * level);
     }
 
     public void tick() {
@@ -41,7 +44,7 @@ public class Hunter extends Player {
     @Override
     public void castAbility(ArrayList<Unit> target) {
         if (arrowCount <= 0) {
-           messageCallback.addSystemMassage("could not cast ability, no arrows");
+           
         }
         arrowCount--;
         target.get(0).takeDamage(attack,this);
@@ -55,9 +58,7 @@ public class Hunter extends Player {
 
     @Override
     public String toString() {
-        return String.format(
-                "Name: %s | Health: %d/%d | Attack: %d | Defense: %d | Level: %d | Experience: %d/%d | Range: %d | Arrow Count: %d",
-                name, currentHealth, maxHealth, attack, defense, level, exp, EXP_PER_LEVEL, range, arrowCount);
+        return super.toString() + String.format(" | Arrow Count: %d/%d", arrowCount, 10 * level);
     }
 
 }

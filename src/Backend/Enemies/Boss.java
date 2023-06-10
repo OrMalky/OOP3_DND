@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import Backend.Enemy;
 import Backend.HeroicUnit;
-import Backend.MassageCallBack;
 import Backend.Unit;
 
 public class Boss extends Enemy implements HeroicUnit {
@@ -12,9 +11,9 @@ public class Boss extends Enemy implements HeroicUnit {
     int abilityFrequency;
     int combatTicks;
 
-    public Boss(int _visionRange, int _abilityFrequency, String _name, int _maxHealth, int _attack, int _defense,
-            int _expValue,MassageCallBack _massageCallBack) {
-        super(_name, _maxHealth, _attack, _defense, _expValue, _massageCallBack);
+    public Boss(String _name, Character _tile, int _maxHealth, int _attack, int _defense, int _visionRange, int _abilityFrequency, 
+            int _expValue) {
+        super(_name, _tile, _maxHealth, _attack, _defense, _expValue);
         visionRange = _visionRange;
         abilityFrequency = _abilityFrequency;
         combatTicks = 0;

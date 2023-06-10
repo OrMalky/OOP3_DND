@@ -1,6 +1,5 @@
 package Backend.PlayerCharacters;
 
-import Backend.MassageCallBack;
 import Backend.Player;
 import Backend.Unit;
 import java.util.ArrayList;
@@ -11,14 +10,18 @@ public class Warrior extends Player {
 
     protected int abilityCooldown;
     protected int currentCooldown;
+
     protected final int ABILITY_RANGE = 3;
+    protected final int HEALTH_PER_LEVEL = 2;
+    protected final int ATTACK_PER_LEVEL = 2;
+    protected final int DEFENSE_PER_LEVEL = 1;
 
     private Random rand = new Random();
 
-    public Warrior(String _name, int _maxHealth, int _attack, int _defense, int _abilityCooldown,
-            MassageCallBack _massageCallBack) {
-        super(_name, _maxHealth, _attack, _defense, _massageCallBack);
+    public Warrior(String _name, int _maxHealth, int _attack, int _defense, int _abilityCooldown) {
+        super(_name, _maxHealth, _attack, _defense);
         abilityCooldown = _abilityCooldown;
+        type = Type.WARRIOR;
     }
 
     // Not sure we want this to work this way, we need a way to tell the GameManager
@@ -31,7 +34,7 @@ public class Warrior extends Player {
             targets.get(rand.nextInt(targets.size())).takeDamage(maxHealth / 10, this);
 
         } else {
-            messageCallback.addSystemMassage("Could not cast ability: ability on cooldown");
+            
         }
 
     }
@@ -39,9 +42,9 @@ public class Warrior extends Player {
     public void levelUp() {
         super.levelUp();
         abilityCooldown = 0;
-        setMaxHealth(maxHealth + 5 * level);
-        setAttack(attack + 2 * level);
-        setDefense(defense + 1 * level);
+        setMaxHealth(maxHealth + HEALTH_PER_LEVEL * level);
+        setAttack(attack + ATTACK_PER_LEVEL * level);
+        setDefense(defense + DEFENSE_PER_LEVEL * level);
     }
 
     public void tick() {
@@ -55,10 +58,6 @@ public class Warrior extends Player {
 
     @Override
     public String toString() {
-        return String.format(
-                "Name: %s | Health: %d/%d | Attack: %d | Defense: %d | Level: %d | Experience: %d/%d | Cooldown: %d/%d",
-                name, currentHealth, maxHealth, attack, defense, level, exp, EXP_PER_LEVEL, currentCooldown,
-                abilityCooldown);
-
+        return super.toString() + String.format(" | Ability Cooldown: %d/%d", currentCooldown, abilityCooldown);
     }
 }
