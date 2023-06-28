@@ -5,6 +5,7 @@ import java.util.List;
 
 import Backend.GameBoard;
 import Backend.Player;
+import Backend.Unit;
 
 
 public class GameCLI {
@@ -15,15 +16,22 @@ public class GameCLI {
     }
 
     public void renderPlayerBar(Player player) {
-        System.out.println(player.toString());
+        System.out.println(player.getDescription());
+    }
+
+    public void renderEnemyBar(Unit enemy){
+        if(enemy != null)
+            System.out.println(enemy.getDescription());
+        else
+            System.out.println();
     }
 
     public void renderBoard(GameBoard board) {
-        System.out.println(board.toString());
+        System.out.println("\n" + board.toString());
     }
 
     public void render(String output) {
-        System.out.println(output);
+        System.out.print(output);
     }
 
     public void clearConsole() {
@@ -47,19 +55,18 @@ public class GameCLI {
         int index = 1;
         StringBuilder selectionString = new StringBuilder("Welcome to Dungeons & Dragons!\n");
         for (Player c : characters) {
-            selectionString.append(index + "\t" + c.getDescription() + '\n');
+            selectionString.append(index + "\t" + c.getInfo() + '\n');
             index++;
         }
         selectionString.append("\n");
-        selectionString.append(popMessages() + '\n');
+        selectionString.append(popMessages());
         selectionString.append("Choose your character: ");
         System.out.print(selectionString.toString());
     }
 
     public void printMessages(){
-        System.out.println();
         for (String message : messages) {
-            System.out.println(message + '\n');
+            System.out.println(message);
         }
         messages.clear();
     }
@@ -67,7 +74,7 @@ public class GameCLI {
     private String popMessages(){
         StringBuilder messageString = new StringBuilder();
         for (String message : messages) {
-            messageString.append(message);
+            messageString.append(message + '\n');
         }
         messages.clear();
         return messageString.toString();

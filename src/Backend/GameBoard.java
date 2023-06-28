@@ -3,41 +3,18 @@ package Backend;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+
+import Backend.GameTile.TileType;
 
 public class GameBoard {
 
-    public enum Direction {
-        UP(0, -1),
-        DOWN(0, 1),
-        LEFT(-1, 0),
-        RIGHT(1, 0);
-
-        private final int deltaX;
-        private final int deltaY;
-
-        Direction(int horozonial, int vertial) {
-            this.deltaX = horozonial;
-            this.deltaY = vertial;
-        }
-
-        public int getDeltaX() {
-            return deltaX;
-        }
-
-        public int getDeltaY() {
-            return deltaY;
-        }
-
-        public Position2D getDeltaPosition() {
-            return new Position2D(deltaX, deltaY);
-        }
-    }
-
     private GameTile[][] currentBoard;
+    private static GameTile[][] nextBoard;
+
     private Player player;
     private CharacterFactory cf;
     private GameTile playerTile;
+    private int level;
 
     private final char EMPTY = '.';
     private final char WALL = '#';
@@ -46,17 +23,7 @@ public class GameBoard {
     GameBoard(CharacterFactory _cf, Player _player) {
         cf = _cf;
         player = _player;
-    }
-
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        for (GameTile[] row : currentBoard) {
-            for (GameTile tile : row) {
-                s.append(tile == null ? "." : tile.getUnit() == null ? '#' : tile.getUnit().getTile());
-            }
-            s.append("\n");
-        }
-        return s.toString();
+        level = 1;
     }
 
     public double getRange(Position2D pos1, Position2D pos2) {
@@ -64,11 +31,11 @@ public class GameBoard {
         return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.y - pos2.y, 2));
     }
 
-    public void parseLevel(int level) {
+    public void parseLevel() {
         String[] levelString = readMap(level).split("\n");
         int rows = levelString.length;
         int cols = levelString[0].length();
-        currentBoard = new GameTile[rows][cols];
+        nextBoard = new GameTile[rows][cols];
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 char tileChar = levelString[y].charAt(x);
@@ -76,16 +43,17 @@ public class GameBoard {
                 setTileAt(createGameTile(tileChar, pos), pos);
             }
         }
+        currentBoard = nextBoard;
     }
 
-    public void tick() {
+    public void tick() {  
         for (GameTile[] row : currentBoard) {
             for (GameTile tile : row) {
-                if (tile != null && tile.getUnit() != null){
+                if(tile != null && tile.getUnit() != null)
                     tile.getUnit().tick();
-                }
             }
         }
+        currentBoard = nextBoard;
     }
 
     private GameTile createGameTile(char tileChar, Position2D pos) {
@@ -93,12 +61,15 @@ public class GameBoard {
             case EMPTY:
                 return null;
             case WALL:
-                return new GameTile(null, pos);
+                return new GameTile(TileType.WALL, null);
             case PLAYER:
-                playerTile = new GameTile(player, pos);
+                player.setPosition(pos);
+                playerTile = player.getGameTile();
                 return playerTile;
             default:
-                return new GameTile(cf.createEnemy(tileChar), pos);
+                Enemy e = cf.createEnemy(tileChar, pos);
+                GameManager.addEnemy(e);
+                return e.getGameTile();
         }
     }
 
@@ -116,53 +87,44 @@ public class GameBoard {
         return text.toString();
     }
 
-    // Player interaction
-    public boolean interact(Direction direction) {
-        GameTile player = getTileAt(playerTile.getPosition());
-        Position2D newPos = Position2D.add(playerTile.getPosition(), direction.getDeltaPosition());
-        if(getTileAt(newPos) == null) {
-            move(player, newPos);
-            return true;
-        } else {
-            return interact(player, getTileAt(newPos));
-        }
-    }
-
-    // Tiles interactions
-    public boolean interact(GameTile performer, GameTile target) {
-        if(target.getUnit() == null)
+    public boolean move(GameTile tile, Position2D pos){
+        if (getTileAt(pos) != null)
             return false;
-        return true;
-    }
 
-    private void move(GameTile tile, Position2D pos){
         Position2D oldPos = tile.getPosition();
         setTileAt(tile, pos);
         setTileAt(null, oldPos);
         tile.setPosition(pos);
+        return true;
     }
 
-    ArrayList<Unit> getAllUnitsInRange(int range) {
-        ArrayList<Unit> unitsInRange = new ArrayList<Unit>();
-        for (int i = 0; i < currentBoard.length; i++) {
-            for (GameTile tile : currentBoard[i]) {
-                if (tile != null && tile.getUnit() != null && getRange(tile.getPosition(), playerTile.getPosition()) <= range)
-                    unitsInRange.add(tile.getUnit());
-            }
+    public boolean advanceLevel() {
+        level++;
+        try{
+            parseLevel();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        return unitsInRange;
     }
 
-    public void castSpecialAbility() {
-        ArrayList<Unit> unitsInRange = getAllUnitsInRange(player.getAbilityRange());
-        player.castAbility(unitsInRange);
+    public GameTile getTileAt(Position2D pos){
+        return nextBoard[pos.y][pos.x];
     }
 
-    private GameTile getTileAt(Position2D pos){
-        return currentBoard[pos.y][pos.x];
+    public void setTileAt(GameTile tile, Position2D pos){
+        nextBoard[pos.y][pos.x] = tile;
     }
 
-    private void setTileAt(GameTile tile, Position2D pos){
-        currentBoard[pos.y][pos.x] = tile;
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        for (GameTile[] row : currentBoard) {
+            for (GameTile tile : row) {
+                s.append(tile == null ? EMPTY : tile.getUnit() == null ? WALL : tile.toString());
+            }
+            s.append("\n");
+        }
+        return s.toString();
     }
 }

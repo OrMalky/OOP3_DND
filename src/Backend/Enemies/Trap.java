@@ -1,6 +1,8 @@
 package Backend.Enemies;
 
 import Backend.Enemy;
+import Backend.Position2D;
+import Backend.Unit;
 
 public class Trap extends Enemy {
     protected int visibilityRange;
@@ -9,8 +11,11 @@ public class Trap extends Enemy {
     protected int ticksCount;
     protected boolean isVisible;
 
-    public Trap(String _name, Character _tile, int _maxHealth, int _attack, int _defense, int _expValue, int _visibilityTime, int _invisibilityTime) {
-        super(_name, _tile, _maxHealth, _attack, _defense, _expValue);
+    private final int RANGE = 2;
+
+    public Trap(String _name, char _tile, int _maxHealth, int _attack, int _defense, int _expValue, int _visibilityTime,
+            int _invisibilityTime, Position2D _position) {
+        super(_name, _tile, _maxHealth, _attack, _defense, _expValue, _position, EnemyType.TRAP);
         // visibilityRange = _visibilityRange;
         visibilityTime = _visibilityTime;
         invisibilityTime = _invisibilityTime;
@@ -19,9 +24,31 @@ public class Trap extends Enemy {
     }
 
     @Override
-    public void tick() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'tick'");
+    public Position2D turn(Unit player) {
+        isVisible = ticksCount < visibilityTime;
+        if (ticksCount == (visibilityTime + invisibilityTime)) {
+            ticksCount = 0;
+        } else {
+            ticksCount++;
+        }
+        if(Position2D.getRange(position, player.getPosition()) < RANGE){
+            interact(player);
+        }
+        return null;
     }
 
+    @Override
+    public String getDescription() {
+        // TODO Auto-generated method stub
+        return "TODO";
+    }
+
+    @Override
+    public String toString() {
+        if (isVisible) {
+            return super.toString();
+        } else {
+            return ".";
+        }
+    }
 }

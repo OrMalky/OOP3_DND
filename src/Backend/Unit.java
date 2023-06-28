@@ -4,34 +4,53 @@ import java.util.Random;
 
 public abstract class Unit {
 
-    protected Character tile;
+    protected enum UnitType{
+        PLAYER,
+        ENEMY
+    }
+
+    protected UnitType unitType;
+    protected char tileChar;
     protected String name;
     protected int maxHealth;
     protected int currentHealth;
     protected int attack;
     protected int defense;
+    protected int expValue;
+    protected boolean isDead;
+    protected Position2D position;
+    protected GameTile gameTile;
 
-    private Random rand = new Random();
+    protected Random rand = new Random();
 
-    public Unit(String _name, Character _tile, int _maxHealth, int _attack, int _defense) {
+    public Unit(String _name, char _tile, int _maxHealth, int _attack, int _defense, Position2D _position, UnitType _type) {
         name = _name;
+        tileChar = _tile;
         maxHealth = _maxHealth;
         attack = _attack;
         defense = _defense;
         currentHealth = maxHealth;
-        tile = _tile;
+        position = _position;
+        isDead = false;
+        unitType = _type;
     }
 
-    public void takeDamage(int attackPoints, Unit attacker) {
-        int attackRoll = rand.nextInt(attackPoints);
+    public int takeDamage(int incomingDamage) {
         int defenceRoll = rand.nextInt(defense);
-        int damage = attackRoll - defenceRoll;
-        setCurrentHealth(damage > 0 ? (currentHealth - damage) : currentHealth);
-        if (currentHealth <= 0) {
-            currentHealth = 0;
-        }
-
+        int damage = Math.max(incomingDamage - defenceRoll, 0);
+        currentHealth = Math.max(currentHealth - damage, 0);
+        if(currentHealth <= 0)
+            isDead = true;
+        return damage;
     }
+
+    public abstract void die();
+
+    public void tick() {
+        //Do nothing
+    };
+
+    public abstract Integer accept(UnitVisitor visitor);
 
     public String getName() {
         return name;
@@ -49,9 +68,6 @@ public abstract class Unit {
         return attack;
     }
 
-    public abstract void tick();
-
-
     public int getDefense() {
         return defense;
     }
@@ -61,7 +77,16 @@ public abstract class Unit {
     }
 
     public void setCurrentHealth(int _currentHealth) {
+        assert _currentHealth <= maxHealth;
+        assert _currentHealth >= 0;
         currentHealth = _currentHealth;
+    }
+
+    public int heal(int amount){
+        assert amount >= 0;
+        int h = currentHealth;
+        currentHealth = Math.min(currentHealth + amount, maxHealth);
+        return currentHealth - h;
     }
 
     public void setAttack(int _attack) {
@@ -72,8 +97,26 @@ public abstract class Unit {
         defense = _defense;
     }
 
-    public Character getTile(){
-        return tile;
-    };
+    public boolean isDead(){
+        return isDead;
+    }
 
+    public void setPosition(Position2D pos){
+        position = pos;
+    }
+
+    public Position2D getPosition(){
+        return position;
+    }
+    
+    public abstract Integer interact(Unit target);
+
+    public abstract int getExpValue();
+
+    public abstract String getDescription();
+
+    @Override
+    public String toString(){
+        return String.valueOf(tileChar);
+    }
 }

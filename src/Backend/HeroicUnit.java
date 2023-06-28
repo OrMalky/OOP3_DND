@@ -1,13 +1,5 @@
 package Backend;
-import java.util.ArrayList;
+import java.util.List;
 public interface HeroicUnit {
-
-
-    public void castAbility(ArrayList<Unit> target);
-
-    public int getAbilityRange();
-
-
-
-
+    public Report castAbility(List<Unit> target);
 }

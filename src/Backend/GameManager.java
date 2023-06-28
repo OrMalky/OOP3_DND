@@ -1,22 +1,30 @@
 package Backend;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Stack;
+import java.util.stream.Collectors;
 
-import Backend.GameBoard.Direction;
+import Backend.CharacterFactory.PlayerCharacter;
 import Frontend.GameCLI;
 
 public class GameManager {
     private Scanner scanner;
 
-    private GameBoard board;
+    private static GameBoard board;
     private GameCLI gameCLI;
     private CharacterFactory cf;
+    private static Stack<String> messageStack = new Stack<>();
+    private static List<Enemy> allEnemies;
     
     private Player player;
+    private Unit currentEnemy;
 
     private boolean gameStarted;
     private boolean isOver;
 
+    //Input bindings
     private final String UP = "w";
     private final String DOWN = "s";
     private final String LEFT = "a";
@@ -27,6 +35,7 @@ public class GameManager {
     public GameManager() {
         isOver = false;
         gameStarted = false;
+        allEnemies = new ArrayList<>();
 
         cf = new CharacterFactory();
         scanner = new Scanner(System.in);
@@ -34,22 +43,23 @@ public class GameManager {
     }
 
     public void startGame() {
-        CharacterFactory.Character playerCharacter = characterSelection();
+        CharacterFactory.PlayerCharacter playerCharacter = characterSelection();
         player = cf.choosePlayer(playerCharacter);
+        allEnemies = new ArrayList<>();
         board = new GameBoard(cf, player);
-        board.parseLevel(1);
+        board.parseLevel();
         gameLoop();
     }
 
-    private CharacterFactory.Character characterSelection(){
-        CharacterFactory.Character character = null;
+    private PlayerCharacter characterSelection(){
+        PlayerCharacter character = null;
         int input = 0;
         do {
             gameCLI.clearConsole();
             gameCLI.printOpeningScreen(cf.getCharacters());
             try{
                 input = scanner.nextInt();
-                character = CharacterFactory.Character.values()[input - 1];
+                character = CharacterFactory.PlayerCharacter.values()[input - 1];
                 gameStarted = true;
             } catch (Exception e) {
                 scanner.nextLine();
@@ -59,56 +69,184 @@ public class GameManager {
         return character;
     }
 
-    public void gameLoop() {
+    private void gameLoop() {
         while (!isOver) {
-            boolean isValid = false;
+            //Check level end
+            if(allEnemies.isEmpty() && !isOver){
+                levelEnd();
+            }
+
+            //Player turn
+            boolean isValid;
             do{
-                gameCLI.clearConsole();
-                gameCLI.renderPlayerBar(player);
-                gameCLI.renderBoard(board);
-                gameCLI.printMessages();
+                isValid = false;
+                renderUI();
                 gameCLI.render("Choose an action: ");
                 String input = scanner.next();
                 isValid = handleInput(input);
             } while (!isValid);
+
+            //Enemy turn
+            for (Enemy enemy : allEnemies) {
+                Boolean outcome = false;
+                do{
+                    Position2D dir = enemy.turn(player);
+                    if (dir != null) {
+                        Position2D pos = Position2D.add(enemy.getPosition(), dir);
+                        outcome = interaction(enemy.getGameTile(), pos);
+                    }
+                } while (outcome == null);
+            }
+
+            if(player.isDead()){
+                player.die();
+                gameCLI.addMessage(player.getName() + " died");
+                isOver = true;
+                renderUI();
+            }
+
             board.tick();
         }
+        scanner.nextLine();
+        renderUI();
+        gameCLI.render("Press Enter key to continue...");
+        scanner.nextLine();
+    }
+
+    private void renderUI(){
+        gameCLI.clearConsole();
+        gameCLI.renderPlayerBar(player);
+        gameCLI.renderEnemyBar(currentEnemy);
+        gameCLI.renderBoard(board);
+        popMessages();
+        gameCLI.printMessages();
     }
 
     public boolean handleInput(String input) {
-        Direction dir = null;
+        Position2D dir = null;
         switch (input) {
             case UP:
-                dir = Direction.UP;
+                dir = Position2D.UP;
                 break;
             case DOWN:
-                dir = Direction.DOWN;
+                dir = Position2D.DOWN;
                 break;
             case LEFT:
-                dir = Direction.LEFT;
+                dir = Position2D.LEFT;
                 break;
             case RIGHT:
-                dir = Direction.RIGHT;
+                dir = Position2D.RIGHT;
                 break;
             case WAIT:
                 return true;
             case SPECIAL_ABILITY:
-                board.castSpecialAbility();
-                break;
+                List<Unit> monsters = allEnemies.stream().filter(
+                        enemy -> enemy.getEnemyType() == Enemy.EnemyType.MONSTER).collect(Collectors.toList());
+                Report report = player.castAbility(monsters);
+                popMessages();
+                if(report == null)
+                    return false;
+                if(report.units == null)
+                    return true;
+                for (Unit unit : report.units) {
+                    if(unit.isDead())
+                        enemyDied(unit);
+                }
+                return true;
             default:
-                gameCLI.addMessage("Invalid input " + input + " try again");
+                gameCLI.addMessage("Invalid input try again");
                 return false;
         }
-        return playInput(dir);
+
+        Position2D newPosition = Position2D.add(player.getPosition(), dir);
+        return processOutcome(interaction(player.getGameTile(), newPosition), newPosition);  
     }
 
-    private boolean playInput(Direction direction) {
-        if(!board.interact(direction))
-        {
+    private boolean processOutcome(Boolean outcome, Position2D newPosition){
+        //Invalid move
+        if (outcome == null){
             gameCLI.addMessage("Invalid move");
             return false;
+        } else {
+            //Interaction
+            if(outcome) {
+                currentEnemy = board.getTileAt(newPosition).getUnit();
+                if(currentEnemy.isDead()){
+                    enemyDied(currentEnemy);
+                    board.move(player.gameTile, newPosition);
+                }
+            }
+            else    //Move
+                currentEnemy = null;
+            return true;
         }
-        return true;
+    }
+
+    private Boolean interaction(GameTile actor, Position2D pos) {
+        GameTile target = board.getTileAt(pos);
+        // Empty => Move
+        if (target == null){ 
+            board.move(actor, pos);   
+            return false;
+        } 
+
+        // Wall => Invalid move
+        if (target.getUnit() == null){
+            return null;
+        }
+
+        // Unit => Interact
+        Unit actorUnit = actor.getUnit();
+        Unit targetUnit = target.getUnit();
+        Integer outcome = actorUnit.interact(targetUnit);
+        if(outcome != null) {
+            gameCLI.addMessage(actorUnit.getName() + " attacked " + targetUnit.getName() + " for " + outcome.toString() + " damage");
+            return true;            
+        }
+        return null;
+    }
+
+    private void levelEnd(){
+        gameCLI.addMessage("All enemies are dead");
+        gameCLI.addMessage("Press Enter key to continue...");
+        renderUI();
+        scanner = new Scanner(System.in);
+        scanner.nextLine();
+        if(!board.advanceLevel()) {
+            gameCLI.addMessage("You have reached the end of the dungeon!");
+            isOver = true;
+        } else {
+            gameCLI.addMessage("You have entered to the next level of the dungeon");
+        }
+    }
+
+    private void enemyDied(Unit dead){
+        dead.die();
+        player.gainExp(dead.getExpValue());
+        board.setTileAt(null, dead.getPosition());
+        gameCLI.addMessage(player.getName() + " killed " + dead.getName() + " and gained " + dead.getExpValue() + " experience");
+        currentEnemy = null;
+    }
+
+    public static boolean isTileEmpty(Position2D pos){
+        return board.getTileAt(pos) == null;
+    }
+
+    private void popMessages(){
+        while(!messageStack.isEmpty())
+            gameCLI.addMessage(messageStack.pop());
+    }
+
+    public static void addMessage(String message){
+        messageStack.push(message);
+    }
+
+    public static void removeEnemy(Enemy enemy){
+        allEnemies.remove(enemy);
+    }
+
+    public static void addEnemy(Enemy enemy){
+        allEnemies.add(enemy);
     }
 
     public boolean isGameStarted() {
